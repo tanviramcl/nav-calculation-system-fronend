@@ -25,14 +25,16 @@ import {
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import CircularProgress from "@mui/material/CircularProgress";
-import Backdrop from "@mui/material/Backdrop";
 
 import { getmanagementFeeList } from "../api/expensePayableApi";
 import { getExpenseTypeList } from "../api/expensePayableApi";
 
 import EditIcon from "@mui/icons-material/Edit";
 import IconButton from "@mui/material/IconButton";
+
+//////////////////////////modal/////////////////////////////////
+import ExpensePayableUpdateModal from "../components/Expense/ExpensePayableUpdateModal";
+
 
 
 
@@ -47,11 +49,12 @@ const Expencepayableentry = () => {
 
   const [expenseTypes, setExpenseTypes] = React.useState([]);
   const [expenseType, setExpenseType] = React.useState("");
-  const [rowSelectionModel, setRowSelectionModel] = useState({
-    type: "include",
-    ids: new Set(),
-  });
+ 
   const [selectedIds, setSelectedIds] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedRows, setSelectedRows] = useState([]);
+  
+
   useEffect(() => {
     const loadExpenseTypes = async () => {
       try {
@@ -189,25 +192,33 @@ const Expencepayableentry = () => {
   };
 
   const handleSave = () => {
-    console.log("Selected Ids:", selectedIds);
-
+   
     const selectedData = rows.filter((row) =>
-      selectedIds.includes(row.fundCode)
-    );
+    selectedIds.includes(row.fundCode)
+  );
 
-    console.log("Selected Data:", selectedData);
+  if (!selectedData.length) {
+    alert("Please select at least one row.");
+    return;
+  }
 
-    if (!selectedData.length) {
-      alert("Please select at least one row.");
-      return;
-    }
+  setSelectedRows(selectedData);
+  setOpenModal(true);
 
-    alert(
-      `Selected ${selectedData.length} Fund(s)\n\n${selectedData
-        .map((x) => x.fundCode)
-        .join(", ")}`
-    );
   };
+
+  const handleUpdate = () => {
+  const ids = selectedRows.map((x) => x.fundCode);
+
+  alert(
+    `Selected Fund IDs:\n\n${ids.join(", ")}`
+  );
+
+  console.log("Selected Rows:", selectedRows);
+  alert(selectedRows);
+
+  setOpenModal(false);
+}
 
   return (
     <Box sx={{ p: 3 }}>
@@ -233,7 +244,7 @@ const Expencepayableentry = () => {
           direction="row"
           spacing={2}
           alignItems="center"
-        >
+        > 
 
           <FormControl size="small" sx={{ minWidth: 220 }}>
             <InputLabel id="expense-type-label">
@@ -296,11 +307,7 @@ const Expencepayableentry = () => {
             variant="contained"
             color="success"
             onClick={handleSave}
-            sx={{
-              fontWeight: 600,
-              textTransform: "none",
-              borderRadius: 2,
-            }}
+           
           >
             Save
           </Button>
@@ -351,6 +358,12 @@ const Expencepayableentry = () => {
         open={loading}
 
 
+      />
+            <ExpensePayableUpdateModal
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        selectedRows={selectedRows}
+        onUpdate={handleUpdate}
       />
     </Box>
   );
