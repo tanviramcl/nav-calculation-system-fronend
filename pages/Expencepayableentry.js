@@ -303,14 +303,7 @@ const Expencepayableentry = () => {
           >
             Find
           </Button>
-          <Button
-            variant="contained"
-            color="success"
-            onClick={handleSave}
-           
-          >
-            Save
-          </Button>
+         
         </Stack>
       </Paper>
 
@@ -323,6 +316,22 @@ const Expencepayableentry = () => {
           overflow: "hidden",
         }}
       >
+      <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            p: 1,
+            borderBottom: "1px solid #e0e0e0",
+          }}
+        >
+          <Button
+            variant="contained"
+            color="success"
+            onClick={handleSave}
+          >
+            Save
+          </Button>
+        </Box>
         <DataGrid
           rows={rows}
           columns={columns}
