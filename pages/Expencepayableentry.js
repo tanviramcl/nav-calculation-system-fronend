@@ -15,6 +15,7 @@ import MenuItem from "@mui/material/MenuItem";
 import InputLabel from "@mui/material/InputLabel";
 import SearchIcon from "@mui/icons-material/Search";
 import LoadingBackdrop from "../components/common/LoadingBackdrop";
+import { toast } from "react-toastify";
 
 
 import {
@@ -26,14 +27,18 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
-import { getmanagementFeeList } from "../api/expensePayableApi";
-import { getExpenseTypeList } from "../api/expensePayableApi";
+import {
+  getmanagementFeeList,
+  getExpenseTypeList,
+  saveExpensePayable,
+} from "../api/expensePayableApi";
 
 import EditIcon from "@mui/icons-material/Edit";
 import IconButton from "@mui/material/IconButton";
 
 //////////////////////////modal/////////////////////////////////
 import ExpensePayableUpdateModal from "../components/Expense/ExpensePayableUpdateModal";
+import ExpensePayableSkipModal  from "../components/Expense/ExpensePayableSkipModal";
 
 
 
@@ -53,7 +58,10 @@ const Expencepayableentry = () => {
   const [selectedIds, setSelectedIds] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
-  
+
+  const [openSkipModal, setOpenSkipModal] = useState(false);
+  const [skippedRecords, setSkippedRecords] = useState([]);
+    
 
   useEffect(() => {
     const loadExpenseTypes = async () => {
@@ -207,19 +215,88 @@ const Expencepayableentry = () => {
 
   };
 
-  const handleUpdate = () => {
-  const ids = selectedRows.map((x) => x.fundCode);
+  const handleUpdate = async () => {
+    try {
+      setLoading(true);
 
-  alert(
-    `Selected Fund IDs:\n\n${ids.join(", ")}`
-  );
+        const payload = selectedRows.map((row) => ({
+          NAV_DATE: value.format("YYYY-MM-DD"),
 
-  console.log("Selected Rows:", selectedRows);
-  alert(selectedRows);
+          FUND_CD: row.fundCode,
 
-  setOpenModal(false);
-}
+          FUND_NAME: row.fundName,
 
+          EXPENSE_TYPE_ID: Number(expenseType),
+
+          EXPENSE_TYPE_NAME:
+              expenseTypes.find(
+                  x => x.expenseTypeId === Number(expenseType)
+              )?.expenseTypeName,
+
+
+          PORTFOLIO_MARKET_VALUE: row.portfolioMarketValue,
+
+          ANNUAL_RATE: row.annualRate,
+
+          DAILY_FEE: row.dailyFee,
+
+          NAV_DAYS: row.navDays,
+
+          ACCRUED_FEE: row.accruedMfee,
+      }));
+
+      console.log("Save Payload:", payload);
+
+      const result = await saveExpensePayable(payload);
+
+      // alert(
+      //   `Successfully Saved\n\nInserted: ${result.insertedCount}\nSkipped: ${result.skippedRecords.length}`
+      // );
+
+        if(result.skippedRecords && result.skippedRecords.length > 0)
+        {
+            setSkippedRecords(result.skippedRecords);
+            setOpenSkipModal(true);
+
+            toast.warning(
+                `Saved: ${result.insertedCount}, Skipped: ${result.skippedRecords.length}`,
+                {
+                    position: "top-right",
+                    autoClose: 4000
+                }
+            );
+        }
+        else
+        {
+            toast.success(
+                `Successfully Saved. Inserted: ${result.insertedCount}`,
+                {
+                    position: "top-right",
+                    autoClose: 3000
+                }
+            );
+        }
+
+      console.log(result);
+
+      setOpenModal(false);
+
+      handleFind();
+    } catch (error) {
+          console.log("FULL ERROR:", error);
+          console.log("API ERROR:", error.response?.data);
+
+      toast.error(
+            "Failed to load data.",
+            {
+                position:"top-right",
+                autoClose:3000
+            }
+        );
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <Box sx={{ p: 3 }}>
       <Typography
@@ -368,11 +445,20 @@ const Expencepayableentry = () => {
 
 
       />
-            <ExpensePayableUpdateModal
-        open={openModal}
-        onClose={() => setOpenModal(false)}
-        selectedRows={selectedRows}
-        onUpdate={handleUpdate}
+          {/* Update Modal */}
+      <ExpensePayableUpdateModal
+          open={openModal}
+          onClose={() => setOpenModal(false)}
+          selectedRows={selectedRows}
+          onUpdate={handleUpdate}
+      />
+
+
+      {/* Skipped Records Modal */}
+      <ExpensePayableSkipModal
+          open={openSkipModal}
+          onClose={() => setOpenSkipModal(false)}
+          records={skippedRecords}
       />
     </Box>
   );

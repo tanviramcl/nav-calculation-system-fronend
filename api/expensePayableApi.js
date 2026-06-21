@@ -48,6 +48,28 @@ export const getmanagementFeeList = async (
   }
 };
 
+export const saveExpensePayable = async (payload) => {
+  try {
+    const res = await api.post(
+      "payable/save-payable",
+      payload
+    );
+
+    return res.data;
+  } catch (error) {
+    console.error("Failed to save expense payable", error);
+
+    toast.error(
+      error.response?.data?.message ||
+      "Failed to save expense payable"
+    );
+
+    throw error;
+  }
+};
+
+
+
 export const loginUser = async (userID, password) => {
   try {
     const response = await api.post("auth/login", {
