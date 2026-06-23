@@ -219,33 +219,40 @@ const Expencepayableentry = () => {
     try {
       setLoading(true);
 
+       const isCustodian = Number(expenseType) === 3;
+
         const payload = selectedRows.map((row) => ({
           NAV_DATE: value.format("YYYY-MM-DD"),
 
           FUND_CD: row.fundCode,
-
           FUND_NAME: row.fundName,
 
           EXPENSE_TYPE_ID: Number(expenseType),
 
           EXPENSE_TYPE_NAME:
-              expenseTypes.find(
-                  x => x.expenseTypeId === Number(expenseType)
-              )?.expenseTypeName,
-
+            expenseTypes.find(
+              x => x.expenseTypeId === Number(expenseType)
+            )?.expenseTypeName,
 
           PORTFOLIO_MARKET_VALUE: row.portfolioMarketValue,
-
           ANNUAL_RATE: row.annualRate,
 
-          DAILY_FEE: row.dailyFee,
+          DAILY_FEE: isCustodian
+              ? row.dailyCustodianFee
+              : row.dailyFee,
 
           NAV_DAYS: row.navDays,
 
-          ACCRUED_FEE: row.accruedMfee,
-      }));
+          ACCRUED_FEE: isCustodian
+              ? row.accrueCustodianFe
+              : row.accruedMfee
+        }));
 
       console.log("Save Payload:", payload);
+
+
+
+
 
       const result = await saveExpensePayable(payload);
 
