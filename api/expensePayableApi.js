@@ -39,7 +39,9 @@ export const getmanagementFeeList = async (
       },
     });
 
-    console.log("ManagmentFeeList API Response:", res.data);
+  //  console.log("ManagmentFeeList API Response:", res.data);
+
+  // alert("ManagmentFeeList API Response: " + JSON.stringify(res.data));
     return res.data || [];
   } catch (error) {
     console.error("Failed to fetch management fees", error);

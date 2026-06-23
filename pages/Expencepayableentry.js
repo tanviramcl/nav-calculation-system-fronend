@@ -87,6 +87,8 @@ const Expencepayableentry = () => {
   // for refresh data grid columns based on API response
 
   useEffect(() => {
+    
+
     if (!expenseType || !value) return;
 
     handleFind();
