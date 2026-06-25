@@ -1,0 +1,1 @@
+  baseURL: process.env.REACT_APP_API_URL || "http://172.16.188.5:8082/api/", production
