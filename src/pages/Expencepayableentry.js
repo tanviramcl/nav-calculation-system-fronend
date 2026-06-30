@@ -222,6 +222,10 @@ const Expencepayableentry = () => {
       setLoading(true);
 
        const isCustodian = Number(expenseType) === 3;
+       const isTrustee = Number(expenseType) === 4;
+       const isAnnualFee = Number(expenseType) === 6;
+       const isLinstingFee = Number(expenseType) === 7;
+      
 
         const payload = selectedRows.map((row) => ({
           NAV_DATE: value.format("YYYY-MM-DD"),
@@ -241,13 +245,27 @@ const Expencepayableentry = () => {
 
           DAILY_FEE: isCustodian
               ? row.dailyCustodianFee
-              : row.dailyFee,
+              : isTrustee
+                ? row.dailyTrusteeFee
+                : isAnnualFee
+                  ? row.dailyAnnualFee
+                : isLinstingFee
+                  ? row.dailyListingFee
+                  : row.dailyFee,
+              
 
           NAV_DAYS: row.navDays,
 
           ACCRUED_FEE: isCustodian
               ? row.accrueCustodianFe
-              : row.accruedMfee
+              : isTrustee
+                ? row.accrueTrusteeFee
+                : isAnnualFee
+                  ? row.accrueAnnualFee
+                  : isLinstingFee
+                  ? row.accrueListingFee
+                  : row.accruedMfee
+              
         }));
 
       console.log("Save Payload:", payload);
