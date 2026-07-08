@@ -21,3 +21,12 @@ export const getNavProcessFunds = async () => {
     throw error;
   }
 };
+export const getLatestPriceRefixAPI = async () => {
+  try {
+    const res = await api.get("nav/latest-price-refix");
+    return res.data.data || [];
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
