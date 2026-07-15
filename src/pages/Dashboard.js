@@ -3,7 +3,7 @@ import { Box, Typography, Grid, useMediaQuery, useTheme, CircularProgress, Paper
 import { useAuth } from "../contexts/AuthContext";
 import StatCards from "../components/Dashboard/StatCards";
 import LoginHistoryChart from "../components/Dashboard/LoginHistoryChart";
-import ProjectUserDistributionChart from "../components/Dashboard/ProjectUserDistributionChart";
+import LatestPriceRefixChart from "../components/Dashboard/LatestPriceRefixChart";
 import { getDashboardStatsAPI } from "../api/userApi";
 
 const Dashboard = () => {
@@ -43,7 +43,7 @@ const Dashboard = () => {
 
       {/* CHARTS */}
         <Box sx={{ p: 2, mb: 2, width: "100%" }}>
-            <ProjectUserDistributionChart />
+            <LatestPriceRefixChart />
         </Box>
 
         <Box sx={{ p: 2, mb: 2, width: "100%" }}>
